@@ -31,6 +31,14 @@ jobs:
       - name: Run Tests
         run: tronbox test
 
+      - name: Save workspace for deploy job
+        uses: actions/upload-artifact@v2
+        with:
+          name: workspace
+          path: |
+            node_modules
+            /usr/local/bin/tronbox
+
   deploy:
     needs: build-and-test  # Deploy only after 'build-and-test' job is successful
     runs-on: ubuntu-latest
@@ -39,19 +47,20 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
 
-      - name: Use Node.js
-        uses: actions/setup-node@v2
+      - name: Restore workspace from build-and-test job
+        uses: actions/download-artifact@v2
         with:
-          node-version: 14
+          name: workspace
+          path: .
 
-      - name: Install TronBox globally
-        run: npm install -g tronbox
-
-      - name: Install project dependencies
-        run: npm install
+      - name: Set up TronBox from restored workspace
+        run: |
+          sudo mv usr/local/bin/tronbox /usr/local/bin/tronbox
+          sudo chmod +x /usr/local/bin/tronbox
 
       - name: Deploy to TRON (nile)
         run: tronbox deploy --network nile
         env:
           PRIVATE_KEY_NILE: ${{ secrets.PRIVATE_KEY_NILE }}
           FULL_NODE_NILE: ${{ secrets.FULL_NODE_NILE }}
+          
