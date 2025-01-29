@@ -17,7 +17,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 14
+          node-version: 20
 
       - name: Install project dependencies
         run: npm install
@@ -42,7 +42,6 @@ jobs:
             contracts
             migrations
             tronbox.js
-            tronbox.config.js
 
   deploy:
     needs: build-and-test
@@ -57,12 +56,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 14
-
-      # Uncomment if you need additional files from the repo that
-      # aren't already in your artifact (like docs, scripts, etc.):
-      # - name: Check out repository
-      #   uses: actions/checkout@v2
+          node-version: 20
 
       - name: Deploy to TRON (Nile)
         run: npx tronbox deploy --network nile
