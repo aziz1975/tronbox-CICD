@@ -19,48 +19,49 @@ jobs:
         with:
           node-version: 14
 
-      - name: Install TronBox globally
-        run: npm install -g tronbox
-
       - name: Install project dependencies
         run: npm install
 
       - name: Compile Contracts
-        run: tronbox compile
+        run: npx tronbox compile
 
       - name: Run Tests
-        run: tronbox test
+        run: npx tronbox test
 
-      - name: Save workspace for deploy job
-        uses: actions/upload-artifact@v2
+      - name: Upload build artifacts
+        if: success()
+        uses: actions/upload-artifact@v3
         with:
-          name: workspace
+          name: build-output
           path: |
+            build
             node_modules
-            /usr/local/bin/tronbox
+            contracts
+            migrations
+            tronbox.js
+            tronbox.config.js
 
   deploy:
-    needs: build-and-test  # Deploy only after 'build-and-test' job is successful
+    needs: build-and-test
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v2
-
-      - name: Restore workspace from build-and-test job
-        uses: actions/download-artifact@v2
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
         with:
-          name: workspace
-          path: .
+          name: build-output
 
-      - name: Set up TronBox from restored workspace
-        run: |
-          sudo mv usr/local/bin/tronbox /usr/local/bin/tronbox
-          sudo chmod +x /usr/local/bin/tronbox
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      # Uncomment if you need to check out the repo in this job
+      # - name: Check out repository
+      #   uses: actions/checkout@v2
 
       - name: Deploy to TRON (nile)
-        run: tronbox deploy --network nile
+        run: npx tronbox deploy --network nile
         env:
           PRIVATE_KEY_NILE: ${{ secrets.PRIVATE_KEY_NILE }}
           FULL_NODE_NILE: ${{ secrets.FULL_NODE_NILE }}
-          
