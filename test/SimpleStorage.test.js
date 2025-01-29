@@ -11,6 +11,6 @@ contract("SimpleStorage", accounts => {
     const instance = await SimpleStorage.deployed();
     await instance.set(123);
     const newValue = await instance.get();
-    assert.equal(newValue.toNumber(), 124, "Value should be updated to 123");
+    assert.equal(newValue.toNumber(), 123, "Value should be updated to 123");
   });
 });
