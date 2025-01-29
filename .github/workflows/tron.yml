@@ -54,3 +54,4 @@ jobs:
         run: tronbox deploy --network nile
         env:
           PRIVATE_KEY_NILE: ${{ secrets.PRIVATE_KEY_NILE }}
+          FULL_NODE_NILE: ${{ secrets.FULL_NODE_NILE }}
