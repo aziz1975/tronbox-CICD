@@ -61,7 +61,7 @@ jobs:
 
           # Search output for errors.
           # If "error", "revert" or "exception" appears (case-insensitive), fail the job.
-          if echo "$OUTPUT" | grep -qi -E "error|revert|exception"; then
+          if echo "$OUTPUT" | grep -qi -E "error|ERROR|revert|exception"; then
             echo "Deployment encountered an error!"
             exit 1
           fi
