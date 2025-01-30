@@ -58,8 +58,19 @@ jobs:
         with:
           node-version: 20
 
-      - name: Deploy to TRON (Nile)
-        run: npx tronbox deploy --network nile
+      - name: Deploy to TRON (Nile) with validation
+        run: |
+          set -e
+          # Run tronbox deploy, capture all output
+          OUTPUT=$(npx tronbox deploy --network nile || true)
+          echo "$OUTPUT"
+
+          # Search output for errors.
+          # If "error", "revert" or "exception" appears (case-insensitive), fail the job.
+          if echo "$OUTPUT" | grep -qi -E "error|revert|exception"; then
+            echo "Deployment encountered an error!"
+            exit 1
+          fi
         env:
           PRIVATE_KEY_NILE: ${{ secrets.PRIVATE_KEY_NILE }}
           FULL_NODE_NILE: ${{ secrets.FULL_NODE_NILE }}
