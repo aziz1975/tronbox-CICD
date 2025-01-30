@@ -26,7 +26,18 @@ jobs:
         run: npx tronbox compile
 
       - name: Run Tests (Nile)
-        run: npx tronbox test --network nile
+        run: |
+          set -e
+          # Run tronbox test, capture all output
+          OUTPUT=$(npx tronbox test --network nile 2>&1 || true)
+          echo "$OUTPUT"
+
+          # Search output for errors.
+          # If "ERROR", "revert" or "exception" appears (case-insensitive), fail the job.
+          if echo "$OUTPUT" | grep -qi -E "ERROR:|revert|exception"; then
+            echo "Testing or deployment encountered an error!"
+            exit 1
+          fi
         env:
           PRIVATE_KEY_NILE: ${{ secrets.PRIVATE_KEY_NILE }}
           FULL_NODE_NILE: ${{ secrets.FULL_NODE_NILE }}
