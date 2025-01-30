@@ -56,7 +56,7 @@ jobs:
         run: |
           set -e
           # Run tronbox deploy, capture all output
-          OUTPUT=$(npx tronbox deploy --network nile || true)
+          OUTPUT=$(npx tronbox deploy --network nile 2>&1 | tee /dev/tty)
           echo "$OUTPUT"
 
           # Search output for errors.
