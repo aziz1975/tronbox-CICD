@@ -25,7 +25,7 @@ jobs:
       - name: Compile Contracts
         run: npx tronbox compile
 
-      - name: Run Tests (Nile)
+      - name: Run Tests (Nile) with validation
         run: |
           set -e
           # Run tronbox test, capture all output

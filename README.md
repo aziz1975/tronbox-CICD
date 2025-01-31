@@ -93,6 +93,9 @@ This repository uses GitHub Actions to automate the build, test, and deployment 
 2. **Set up Node.js**: Uses Node.js version 20 for the deployment process.
 3. **Deploy contracts**: Deploys the contracts to the Nile testnet using `tronbox deploy --network nile`. This step also consumes the `PRIVATE_KEY_NILE` and `FULL_NODE_NILE` secrets.
 
+## Important Note 
+If you encounter the ‘ERROR: No contract or not a valid smart contract’ message in the GitHub Actions logs, simply rerun the jobs. Occasionally, a network glitch causes this error.
+
 ## Setting Up GitHub Secrets
 
 To ensure secure handling of sensitive data, you need to set up the following secrets in your GitHub repository:
