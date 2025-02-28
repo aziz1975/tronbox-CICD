@@ -9,7 +9,6 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -28,12 +27,10 @@ jobs:
       - name: Run Tests (Nile) with validation
         run: |
           set -e
-          # Run tronbox test, capture all output
+          # Run tronbox test and capture output
           OUTPUT=$(npx tronbox test --network nile 2>&1 || true)
           echo "$OUTPUT"
-
-          # Search output for errors.
-          # If "ERROR", "revert" or "exception" appears (case-insensitive), fail the job.
+          # Fail if any error indicators appear
           if echo "$OUTPUT" | grep -qi -E "expected - actual|ERROR:|revert|exception"; then
             echo "Testing or deployment encountered an error!"
             exit 1
@@ -57,7 +54,6 @@ jobs:
   deploy:
     needs: build-and-test
     runs-on: ubuntu-latest
-
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -70,18 +66,34 @@ jobs:
           node-version: 20
 
       - name: Deploy to TRON (Nile) with validation
+        id: deploy
         run: |
           set -e
-          # Run tronbox deploy, capture all output
           OUTPUT=$(npx tronbox deploy --network nile 2>&1 || true)
           echo "$OUTPUT"
-
-          # Search output for errors.
-          # If "ERROR", "revert" or "exception" appears (case-insensitive), fail the job.
           if echo "$OUTPUT" | grep -qi -E "ERROR:|revert|exception"; then
             echo "Deployment encountered an error!"
             exit 1
           fi
+          # Extract the SimpleStorage contract address from output.
+          # Adjust the grep pattern based on your deployment log format.
+          CONTRACT_ADDRESS=$(echo "$OUTPUT" | grep -oE "SimpleStorage: [0-9A-Za-z]+" | awk '{print $2}')
+          echo "Contract deployed at: $CONTRACT_ADDRESS"
+          echo "::set-output name=contract_address::$CONTRACT_ADDRESS"
         env:
           PRIVATE_KEY_NILE: ${{ secrets.PRIVATE_KEY_NILE }}
           FULL_NODE_NILE: ${{ secrets.FULL_NODE_NILE }}
+
+      - name: Verify Contract on TronScan (Nile)
+        run: |
+          set -e
+          CONTRACT_ADDRESS=${{ steps.deploy.outputs.contract_address }}
+          echo "Verifying contract at address: $CONTRACT_ADDRESS"
+          curl -X POST "https://apilist.nile.tronscanapi.com/api/contract/verify" \
+            -F "contractAddress=$CONTRACT_ADDRESS" \
+            -F "contractName=SimpleStorage" \
+            -F "compilerVersion=v0.8.20" \
+            -F "licenseType=MIT" \
+            -F "optimizationUsed=0" \
+            -F "optimizationRuns=0" \
+            -F "sourceCode=@contracts/SimpleStorage.sol"
