@@ -89,7 +89,7 @@ jobs:
           set -e
           CONTRACT_ADDRESS=${{ steps.deploy.outputs.contract_address }}
           echo "Verifying contract at address: $CONTRACT_ADDRESS"
-          curl -X POST "https://apilist.nile.tronscanapi.com/api/contract/verify" \
+          curl -X POST "https://nileapi.tronscan.org/api/contract/verify" \
             -F "contractAddress=$CONTRACT_ADDRESS" \
             -F "contractName=SimpleStorage" \
             -F "compilerVersion=v0.8.20" \
