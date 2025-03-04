@@ -83,17 +83,3 @@ jobs:
         env:
           PRIVATE_KEY_NILE: ${{ secrets.PRIVATE_KEY_NILE }}
           FULL_NODE_NILE: ${{ secrets.FULL_NODE_NILE }}
-
-      - name: Verify Contract on TronScan (Nile)
-        run: |
-          set -e
-          CONTRACT_ADDRESS=${{ steps.deploy.outputs.contract_address }}
-          echo "Verifying contract at address: $CONTRACT_ADDRESS"
-          curl -X POST "https://nileapi.tronscan.org/api/contract/verify" \
-            -F "contractAddress=$CONTRACT_ADDRESS" \
-            -F "contractName=SimpleStorage" \
-            -F "compilerVersion=v0.8.20" \
-            -F "licenseType=MIT" \
-            -F "optimizationUsed=0" \
-            -F "optimizationRuns=0" \
-            -F "sourceCode=@contracts/SimpleStorage.sol"

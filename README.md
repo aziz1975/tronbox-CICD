@@ -27,7 +27,7 @@ This repository demonstrates how to develop, test, and deploy TRON smart contrac
 ## Project Structure
 
 ```bash
-tronbox-project
+tronbox-CICD
 ├── contracts/
 │   ├── SimpleStorage.sol        # Example Solidity contract
 │   ├── Migrations.sol           # Example Migration contract
@@ -45,8 +45,8 @@ tronbox-project
 # Installation & Local Usage
 Clone the Repository
 ```bash
-git clone https://github.com/aziz1975/tronbox-project.git
-cd tronbox-project
+git clone https://github.com/aziz1975/tronbox-CICD.git
+cd tronbox-CICD
 ```
 Install Dependencies
 ```bash
