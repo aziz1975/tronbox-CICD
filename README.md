@@ -1,4 +1,4 @@
-# TronBox Project
+# TronBox CICD
 
 This repository demonstrates how to develop, test, and deploy TRON smart contracts using TronBox and GitHub Actions for continuous integration and deployment (CI/CD). The project includes:
 
