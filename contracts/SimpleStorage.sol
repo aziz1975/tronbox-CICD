@@ -22,11 +22,11 @@ contract SimpleStorage {
         uint bal = balances[msg.sender];
         require(bal > 0, "No balance");
 
-        
+        balances[msg.sender] = 0;
         (bool success,) = msg.sender.call{value: bal}("");
         
         require(success, "Transfer failed");
-	    balances[msg.sender] = 0;
+	    
 
 
     }
