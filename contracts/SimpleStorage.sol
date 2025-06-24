@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 contract SimpleStorage {
     uint256 private storedData;
+    mapping(address => uint) public balances;
 
     constructor(uint256 initialValue) {
         storedData = initialValue;
@@ -14,5 +15,19 @@ contract SimpleStorage {
 
     function get() public view returns (uint256) {
         return storedData;
+    }
+
+        // Vulnerable to reentrancy
+    function withdraw() external {
+        uint bal = balances[msg.sender];
+        require(bal > 0, "No balance");
+
+        
+        (bool success,) = msg.sender.call{value: bal}("");
+        
+        require(success, "Transfer failed");
+	    balances[msg.sender] = 0;
+
+
     }
 }

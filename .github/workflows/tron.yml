@@ -13,10 +13,22 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
 
-      - name: Use Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
           node-version: 20
+
+      - name: Set up Python (for Slither)
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install Slither
+        run: pip3 install slither-analyzer
+
+      - name: Security Analysis with Slither
+        run: slither contracts
+        # Any issues found by Slither will cause a non-zero exit code and fail the job
 
       - name: Install project dependencies
         run: npm install
@@ -30,14 +42,14 @@ jobs:
           # Run tronbox test and capture output
           OUTPUT=$(npx tronbox test --network nile 2>&1 || true)
           echo "$OUTPUT"
-          # Fail if any error indicators appear
+          # Fail if any known error patterns appear
           if echo "$OUTPUT" | grep -qi -E "expected - actual|ERROR:|revert|exception"; then
             echo "Testing or deployment encountered an error!"
             exit 1
           fi
         env:
           PRIVATE_KEY_NILE: ${{ secrets.PRIVATE_KEY_NILE }}
-          FULL_NODE_NILE: ${{ secrets.FULL_NODE_NILE }}
+          FULL_NODE_NILE:  ${{ secrets.FULL_NODE_NILE }}
 
       - name: Upload build artifacts
         if: success()
@@ -60,7 +72,7 @@ jobs:
         with:
           name: build-output
 
-      - name: Use Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
           node-version: 20
@@ -75,11 +87,10 @@ jobs:
             echo "Deployment encountered an error!"
             exit 1
           fi
-          # Extract the SimpleStorage contract address from output.
-          # Adjust the grep pattern based on your deployment log format.
+          # Extract the deployed contract address (adjust pattern as needed)
           CONTRACT_ADDRESS=$(echo "$OUTPUT" | grep -oE "SimpleStorage: [0-9A-Za-z]+" | awk '{print $2}')
           echo "Contract deployed at: $CONTRACT_ADDRESS"
           echo "::set-output name=contract_address::$CONTRACT_ADDRESS"
         env:
           PRIVATE_KEY_NILE: ${{ secrets.PRIVATE_KEY_NILE }}
-          FULL_NODE_NILE: ${{ secrets.FULL_NODE_NILE }}
+          FULL_NODE_NILE:  ${{ secrets.FULL_NODE_NILE }}
