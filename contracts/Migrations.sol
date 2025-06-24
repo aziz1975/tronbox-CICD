@@ -2,18 +2,25 @@
 pragma solidity ^0.8.23;
 
 contract Migrations {
-  address public owner = msg.sender;
-  uint public last_completed_migration;
+    // 1) Mark owner immutable
+    address public immutable owner;
 
-  modifier restricted() {
-    require(
-      msg.sender == owner,
-      "This function is restricted to the contract's owner"
-    );
-    _;
-  }
+    // 2) Use mixedCase naming
+    uint public lastCompletedMigration;
 
-  function setCompleted(uint completed) public restricted {
-    last_completed_migration = completed;
-  }
+    constructor() {
+        owner = msg.sender;
+    }
+
+    modifier restricted() {
+        require(
+            msg.sender == owner,
+            "This function is restricted to the contract's owner"
+        );
+        _;
+    }
+
+    function setCompleted(uint completed) public restricted {
+        lastCompletedMigration = completed;
+    }
 }
